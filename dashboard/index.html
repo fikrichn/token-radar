@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Token Launch Radar — which protocols launch next, and what it is worth</title>
+<link rel="stylesheet" href="app.css">
+</head>
+<body>
+<header class="masthead">
+  <div class="masthead-in">
+    <div>
+      <h1>Token Launch Radar</h1>
+      <p class="tagline">Every protocol in the snapshot that has no token yet, ranked by what its launch would be worth — with the odds it launches at all, and the steps to farm it.</p>
+    </div>
+    <div class="masthead-meta" id="mastheadMeta"></div>
+  </div>
+</header>
+
+<section class="strip" id="integrityStrip" aria-label="Model integrity"></section>
+
+<nav class="controls" aria-label="Board controls">
+  <input id="search" type="search" placeholder="Search name or slug…" autocomplete="off">
+  <select id="categoryFilter" aria-label="Filter by category"></select>
+  <select id="chainFilter" aria-label="Filter by chain"></select>
+  <label class="check"><input id="watchlistOnly" type="checkbox"> Watchlist only</label>
+  <label class="check"><input id="farmFirstOnly" type="checkbox"> Farm verdicts only</label>
+  <div class="viewswitch" role="tablist">
+    <button id="viewBoard" class="on" type="button">Launch board</button>
+    <button id="viewLive" type="button">Peers, priced live</button>
+  </div>
+  <span class="rowcount" id="rowCount"></span>
+</nav>
+
+<main>
+  <section id="boardView">
+    <table id="board">
+      <thead>
+        <tr>
+          <th data-key="rank" class="num sortable">Rank</th>
+          <th data-key="name" class="sortable">Protocol</th>
+          <th data-key="category" class="sortable">Category</th>
+          <th>Chains</th>
+          <th data-key="tvl_usd" class="num sortable">TVL</th>
+          <th data-key="change_7d" class="num sortable">7d %</th>
+          <th data-key="age_days" class="num sortable">Age</th>
+          <th data-key="token_odds_pct" class="num sortable">Token odds</th>
+          <th data-key="implied_value_usd" class="num sortable">Implied value</th>
+          <th data-key="expected_value_usd" class="num sortable">Expected</th>
+          <th data-key="verdict" class="sortable">Verdict</th>
+        </tr>
+      </thead>
+      <tbody id="boardBody"></tbody>
+    </table>
+    <p class="hint">Click a row for the model's working and the full farm plan. Rank is by implied value alone; the expected column prices the odds in.</p>
+  </section>
+
+  <section id="liveView" hidden>
+    <h2>The peers, priced live — the model's own report card</h2>
+    <p class="hint">These protocols already have a token. The same fitted model that prices the board is run on them here, predicted beside actual, so the reader can see where it is strong and where it is not. The full fit was tested held-out twice; both errors are in the strip above.</p>
+    <table id="liveTable">
+      <thead>
+        <tr><th>Protocol</th><th>Category</th><th class="num">TVL</th><th class="num">Actual value</th><th class="num">Model prediction</th><th class="num">Actual / predicted</th></tr>
+      </thead>
+      <tbody id="liveBody"></tbody>
+    </table>
+  </section>
+
+  <section class="excluded" id="excludedSection">
+    <h2>Screened out on purpose</h2>
+    <p class="hint">The largest pre-token names the radar refuses to rank. An exchange's token is the exchange's own business; a wrapped or staked product is a token that already exists in another form. Neither is a launch waiting to happen, so neither is farmable as one.</p>
+    <div id="excludedList"></div>
+  </section>
+
+  <section class="methods">
+    <h2>How the numbers are made</h2>
+    <p><strong>Value.</strong> The model is fitted, not asserted: a least-squares fit in log10 space over the snapshot's traded peers explains a token's market cap from its protocol's TVL, seven-day growth, age, chain count and category. A pre-token protocol's implied value is that fit's prediction from its own figures. The fit is tested held-out twice — the peers are split by a hash of the slug, each half's fit is scored on the half it never saw — and both median errors are printed in the strip at the top, next to the fit's R². One constraint is imposed: the growth term may not go negative. Left free it does, because market caps are sticky while TVL falls and a shrinking protocol's ratio inflates; a radar that rewards collapse is reading an artifact, so the model refits without the term, and the held-out trials run under the same rule.</p>
+    <p><strong>Odds.</strong> Token odds come from the peers' record: within the same category group and TVL band, the share of protocols that already carry a token, shrunk toward the snapshot-wide share so a small group cannot shout. Odds never move a rank; they price the decision, as expected value = implied value × odds.</p>
+    <p><strong>Farms.</strong> Each plan is written from the protocol's own record — its category sets the actions, its main chain sets the gas, its TVL sets the capital, its age sets the hold — and closes with a verdict that weighs the expected value against the plan's out-of-pocket cost. No protocol's name is special-cased anywhere in the model.</p>
+  </section>
+</main>
+
+<aside id="drawer" hidden aria-label="Protocol detail">
+  <button id="drawerClose" type="button" aria-label="Close detail">×</button>
+  <div id="drawerBody"></div>
+</aside>
+
+<script src="../data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
